@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.25024.216" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25024.216" OrganizationSchemaType="Full" CRMServerServiceabilityVersion="9.2.25024.00216">
+  <SolutionManifest>
+    <UniqueName>IncrementalCalculation</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="IncrementalCalculation" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions />
+    <Version>1.0.0.2</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>MCfSCAPS</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="MCfS CAPS" languagecode="1033" />
+      </LocalizedNames>
+      <Descriptions />
+      <EMailAddress xsi:nil="true"></EMailAddress>
+      <SupportingWebsiteUrl xsi:nil="true"></SupportingWebsiteUrl>
+      <CustomizationPrefix>msdyn</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>41955</CustomizationOptionValuePrefix>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+        <Address>
+          <AddressNumber>2</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+      </Addresses>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="29" id="{5f20c0e6-966e-ef11-a670-6045bdd75a2c}" behavior="0" />
+      <RootComponent type="29" id="{68a25912-af59-ef11-a316-6045bd08dd6d}" behavior="0" />
+      <RootComponent type="91" id="{5b8a4a59-23b1-4ca7-b311-b18734bee47e}" schemaName="FindMatchingCalculationProfiles, Version=1.0.0.0, Culture=neutral, PublicKeyToken=70e9d8a2bca0915e" behavior="0" />
+    </RootComponents>
+    <MissingDependencies>
+      <MissingDependency>
+        <Required type="1" schemaName="flowrun" displayName="Flow Run" solution="MicrosoftFlowExtensionsOnline (1.8.46.1)">
+          <package appName="MicrosoftFlowExtensionsCore" version="1.8.46.1">MicrosoftFlowExtensionsAnchor (1.8.46.1)</package>
+        </Required>
+        <Dependent type="29" displayName="Scheduled - Mark and run calculation for Newly Approved Records" id="{68a25912-af59-ef11-a316-6045bd08dd6d}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="msdyn_calculationjob" displayName="Calculation job" solution="msdyn_SustainabilityApplication (2.29.0.2628)">
+          <package appName="Microsoft Sustainability Manager Premium" version="2.29.0.2628">msdyn_SustainabilityPremiumAnchor (2.29.0.2628)</package>
+        </Required>
+        <Dependent type="29" displayName="Run profiles for an activity type with incremental filter " id="{5f20c0e6-966e-ef11-a670-6045bdd75a2c}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="msdyn_calculationjob" displayName="Calculation job" solution="msdyn_SustainabilityApplication (2.29.0.2628)">
+          <package appName="Microsoft Sustainability Manager Premium" version="2.29.0.2628">msdyn_SustainabilityPremiumAnchor (2.29.0.2628)</package>
+        </Required>
+        <Dependent type="29" displayName="Scheduled - Mark and run calculation for Newly Approved Records" id="{68a25912-af59-ef11-a316-6045bd08dd6d}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="msdyn_calculationprofile" displayName="Calculation profile" solution="msdyn_SustainabilityApplication (2.29.0.2628)">
+          <package appName="Microsoft Sustainability Manager Premium" version="2.29.0.2628">msdyn_SustainabilityPremiumAnchor (2.29.0.2628)</package>
+        </Required>
+        <Dependent type="29" displayName="Run profiles for an activity type with incremental filter " id="{5f20c0e6-966e-ef11-a670-6045bdd75a2c}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="msdyn_dataconnectionrefresh" displayName="Connection refresh" solution="msdyn_SustainabilityApplication (2.29.0.2628)">
+          <package appName="Microsoft Sustainability Manager Premium" version="2.29.0.2628">msdyn_SustainabilityPremiumAnchor (2.29.0.2628)</package>
+        </Required>
+        <Dependent type="29" displayName="Scheduled - Mark and run calculation for Newly Approved Records" id="{68a25912-af59-ef11-a316-6045bd08dd6d}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="msdyn_dataimportjob" displayName="Data import job" solution="msdyn_SustainabilityApplication (2.29.0.2628)">
+          <package appName="Microsoft Sustainability Manager Premium" version="2.29.0.2628">msdyn_SustainabilityPremiumAnchor (2.29.0.2628)</package>
+        </Required>
+        <Dependent type="29" displayName="Scheduled - Mark and run calculation for Newly Approved Records" id="{68a25912-af59-ef11-a316-6045bd08dd6d}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="msdyn_sustainabilitydatadefinitionsetting" displayName="Sustainability data definition setting" solution="msdyn_SustainabilityApplication (2.29.0.2628)">
+          <package appName="Microsoft Sustainability Manager Premium" version="2.29.0.2628">msdyn_SustainabilityPremiumAnchor (2.29.0.2628)</package>
+        </Required>
+        <Dependent type="29" displayName="Scheduled - Mark and run calculation for Newly Approved Records" id="{68a25912-af59-ef11-a316-6045bd08dd6d}" />
+      </MissingDependency>
+    </MissingDependencies>
+  </SolutionManifest>
+</ImportExportXml>

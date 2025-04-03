@@ -1,0 +1,528 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps_2": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedcommondataserviceforapps_83942"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "timeZone": "UTC",
+            "schedule": {
+              "hours": [
+                "23"
+              ]
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "249c81d4-1f8c-44e3-86e5-8d92c9424bad"
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "Get_All_Sustainability_Data_Definition_Activities_Enabled_for_Approval": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "c1f832bb-3631-4252-8e20-6cca87a7b2d3"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps_2",
+              "operationId": "ListRecords",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "entityName": "msdyn_sustainabilitydatadefinitionsettings",
+              "fetchXml": "<fetch>\n  <entity name='msdyn_sustainabilitydatadefinitionsetting'>\n    <filter>\n      <condition attribute='msdyn_issourceincalculations' operator='eq' value='1' />\n      <condition attribute='msdyn_requiredataapproval' operator='eq' value='1' />\n    </filter>\n  </entity>\n</fetch>",
+              "$expand": "msdyn_sustainabilitydatadefinition($select=msdyn_entitylogicalname)"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "For_each_activity_type": {
+          "foreach": "@outputs('Get_All_Sustainability_Data_Definition_Activities_Enabled_for_Approval')?['body/value']",
+          "actions": {
+            "Create_A_Temporary_-_Data_Import_Job": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "08447554-1525-41b1-a220-29b6068bbdb5"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps_2",
+                  "operationId": "CreateRecord",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "entityName": "msdyn_dataimportjobs",
+                  "item/msdyn_dataconnection@odata.bind": "/msdyn_dataconnections(msdyn_dataconnectionid=832393a5-e80f-f011-9988-002248092ab2)",
+                  "item/msdyn_dataconnector@odata.bind": "/msdyn_dataconnectors(msdyn_dataconnectorid=3e8b5d97-8459-ef11-a316-6045bd08dd6d)",
+                  "item/msdyn_name": "Incremental Calculation - @{items('For_each_activity_type')?['_msdyn_sustainabilitydatadefinition_value']}  - @{utcNow()}",
+                  "item/msdyn_dataimportjobstatus": 700610003
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Create_A_Temporary_-_Connection_Refresh": {
+              "runAfter": {
+                "Create_A_Temporary_-_Data_Import_Job": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "0ae2932a-561d-41f3-a5f2-8c35f343c30f"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps_2",
+                  "operationId": "CreateRecord",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "entityName": "msdyn_dataconnectionrefreshes",
+                  "item/msdyn_dataconnection@odata.bind": "/msdyn_dataconnections(msdyn_dataconnectionid=832393a5-e80f-f011-9988-002248092ab2)",
+                  "item/msdyn_dataflowid": "Incremental Calculation Connection",
+                  "item/msdyn_dataflowname": "Incremental Calculation Connection",
+                  "item/msdyn_name": "Incremental Calculation - @{items('For_each_activity_type')?['_msdyn_sustainabilitydatadefinition_value']} - @{utcNow()}",
+                  "item/msdyn_nextrefresh": "@utcNow()",
+                  "item/msdyn_startedat": "@utcNow()",
+                  "item/msdyn_dataimportjob@odata.bind": "/msdyn_dataimportjobs(msdyn_dataimportjobid=@{outputs('Create_A_Temporary_-_Data_Import_Job')?['body/msdyn_dataimportjobid']})",
+                  "item/msdyn_refreshstatus": 192350004
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Get_approved_records_since_last_execution": {
+              "runAfter": {
+                "Entity_Name": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "a3c7bd90-19b8-4218-a090-9c1537f4bb34"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps_2",
+                  "operationId": "ListRecords",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "entityName": "@outputs('Entity_Name')",
+                  "fetchXml": "<fetch>\n  <entity name='@{item()?['_LinkEntityAliasPrefixmsdyn_sustainabilitydatadefinition.msdyn_entitylogicalname']}'>\n    <all-attributes />\n    <filter>\n      <condition attribute='modifiedon' operator='ge' value='@{outputs('Last_Successful_Run_Start_Time')}' />\n      <condition attribute='msdyn_approvalstatus' operator='eq' value='700610001' />\n    </filter>\n  </entity>\n</fetch>"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Get_Last_Successful_Run_Start_Time": {
+              "runAfter": {
+                "Create_A_Temporary_-_Connection_Refresh": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "6694bbdf-2030-40e3-8393-5c0d0d3f46d5"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps_2",
+                  "operationId": "ListRecords",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "entityName": "flowruns",
+                  "fetchXml": "<fetch>\n  <entity name='flowrun'>\n    <all-attributes />\n    <filter>\n      <condition attribute='workflowid' operator='eq' value='68a25912-af59-ef11-a316-6045bd08dd6d' />\n      <condition attribute='status' operator='eq' value='Succeeded' />\n    </filter>\n    <order attribute='endtime' descending='true' />\n  </entity>\n</fetch>",
+                  "$top": 1
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Last_Successful_Run_Start_Time": {
+              "runAfter": {
+                "Has_No_Successful_Run": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "ed6bb2dd-68d9-45f6-b772-abd1da421697"
+              },
+              "type": "Compose",
+              "inputs": "@if(outputs('Has_No_Successful_Run'),items('For_each_activity_type')?['modifiedon'],first(body('Get_Last_Successful_Run_Start_Time')?['value'])?['endtime'])"
+            },
+            "Has_No_Successful_Run": {
+              "runAfter": {
+                "Compose": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "c1e5898c-d7c8-4d90-82ad-5aed8b77567f"
+              },
+              "type": "Compose",
+              "inputs": "@empty(body('Get_Last_Successful_Run_Start_Time')?['value'])"
+            },
+            "Compose": {
+              "runAfter": {
+                "Get_Last_Successful_Run_Start_Time": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "4f907af1-fd82-4311-8240-e93b590ba035"
+              },
+              "type": "Compose",
+              "inputs": "@item()"
+            },
+            "Entity_Name": {
+              "runAfter": {
+                "Last_Successful_Run_Start_Time": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "600f07ca-b669-4e25-9da0-c237024000fd"
+              },
+              "type": "Compose",
+              "inputs": "@\r\nif(equals(item()?['_LinkEntityAliasPrefixmsdyn_sustainabilitydatadefinition.msdyn_entitylogicalname'],'msdyn_purchasedenergy'), 'msdyn_purchasedenergies',if(equals(item()?['_LinkEntityAliasPrefixmsdyn_sustainabilitydatadefinition.msdyn_entitylogicalname'],'msdyn_industrialprocess'), 'msdyn_industrialprocesses', concat(item()?['_LinkEntityAliasPrefixmsdyn_sustainabilitydatadefinition.msdyn_entitylogicalname'],'s')))"
+            },
+            "Has_No_Approved_Record": {
+              "runAfter": {
+                "Get_approved_records_since_last_execution": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7bfe94c8-e533-498b-96e8-754feaf71cf0"
+              },
+              "type": "Compose",
+              "inputs": "@empty(outputs('Get_approved_records_since_last_execution')?['body/value'])"
+            },
+            "If_Has_Approval_Record_Since_Last_Execution": {
+              "actions": {
+                "For_Each_Matching_Calculation_Profile": {
+                  "foreach": "@outputs('Find_Matching_Calculation_Profiles')?['body/calcProfileIds']",
+                  "actions": {
+                    "Parse_Calculation_Profile_Object": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "dfa60f7d-3867-47cb-a6f4-1286d00c8be8"
+                      },
+                      "type": "ParseJson",
+                      "inputs": {
+                        "content": "@items('For_Each_Matching_Calculation_Profile')",
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "CalculationProfileId": {
+                              "type": "string"
+                            },
+                            "CalculationProfileName": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "Create_Calculation_Job_(Trigger_Calculation)": {
+                      "runAfter": {
+                        "Parse_Calculation_Profile_Object": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "333e94f0-976f-48aa-bc31-617e23180153"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_commondataserviceforapps_2",
+                          "operationId": "CreateRecord",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                        },
+                        "parameters": {
+                          "entityName": "msdyn_calculationjobs",
+                          "item/msdyn_calculationprofile@odata.bind": "/msdyn_calculationprofiles(msdyn_calculationprofileid=@{body('Parse_Calculation_Profile_Object')?['CalculationProfileId']})",
+                          "item/msdyn_status": 700610000,
+                          "item/msdyn_name": "@{body('Parse_Calculation_Profile_Object')?['CalculationProfileName']}-@{utcNow()}",
+                          "item/msdyn_dataconnectionRefresh@odata.bind": "/msdyn_dataconnectionrefreshes(msdyn_dataconnectionrefreshid=@{outputs('Create_A_Temporary_-_Connection_Refresh')?['body/msdyn_dataconnectionrefreshid']})"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Find_Matching_Calculation_Profiles": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "ae9f4be1-ef67-4e41-a556-507426dfcc42"
+                  },
+                  "type": "Foreach"
+                },
+                "Find_Matching_Calculation_Profiles": {
+                  "runAfter": {
+                    "Turn_it_Approval_Management_Back_on_for_the_activity": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "d03a6013-8ee9-444d-8890-329841145ccf"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_commondataserviceforapps_2",
+                      "operationId": "PerformUnboundAction",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                    },
+                    "parameters": {
+                      "actionName": "msdyn_FindMatchingCalculationProfiles",
+                      "item/dataDefinitionId": "@items('For_each_activity_type')?['_msdyn_sustainabilitydatadefinition_value']",
+                      "item/connectionRefreshId": "@outputs('Create_A_Temporary_-_Connection_Refresh')?['body/msdyn_dataconnectionrefreshid']"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                },
+                "Turn_Off_Approval_Management_and_Do_Updates": {
+                  "actions": {
+                    "Turn_Off_Approval_for_Given_Table": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "c3b582fe-4c9e-4ee0-8e56-6fbb239045d8"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_commondataserviceforapps_2",
+                          "operationId": "UpdateOnlyRecord",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                        },
+                        "parameters": {
+                          "entityName": "msdyn_sustainabilitydatadefinitionsettings",
+                          "recordId": "@items('For_each_activity_type')?['msdyn_sustainabilitydatadefinitionsettingid']",
+                          "item/msdyn_requiredataapproval": false
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Apply_to_each_approved_record": {
+                      "foreach": "@outputs('Get_approved_records_since_last_execution')?['body/value']",
+                      "actions": {
+                        "Condition": {
+                          "actions": {
+                            "Update_records_connection_refresh_id_with_system_one": {
+                              "runAfter": {},
+                              "metadata": {
+                                "operationMetadataId": "5f8d7079-01e6-4cdb-9f9e-2e2c1f43891e"
+                              },
+                              "type": "OpenApiConnection",
+                              "inputs": {
+                                "host": {
+                                  "connectionName": "shared_commondataserviceforapps_2",
+                                  "operationId": "UpdateOnlyRecord",
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                                },
+                                "parameters": {
+                                  "entityName": "@outputs('Entity_Name')",
+                                  "recordId": "@slice(items('Apply_to_each_approved_record')?['@odata.editLink'], add(indexOf(items('Apply_to_each_approved_record')?['@odata.editLink'], '('), 1), indexOf(items('Apply_to_each_approved_record')?['@odata.editLink'], ')'))",
+                                  "item": {
+                                    "msdyn_dataconnectionRefresh@odata.bind": "msdyn_dataconnectionrefreshes(@{outputs('Create_A_Temporary_-_Connection_Refresh')?['body/msdyn_dataconnectionrefreshid']})"
+                                  }
+                                },
+                                "authentication": "@parameters('$authentication')"
+                              }
+                            }
+                          },
+                          "runAfter": {},
+                          "else": {
+                            "actions": {
+                              "Update_a_row": {
+                                "runAfter": {},
+                                "metadata": {
+                                  "operationMetadataId": "29ae92aa-a2b3-4651-ab97-cfa412d041b2"
+                                },
+                                "type": "OpenApiConnection",
+                                "inputs": {
+                                  "host": {
+                                    "connectionName": "shared_commondataserviceforapps_2",
+                                    "operationId": "UpdateOnlyRecord",
+                                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                                  },
+                                  "parameters": {
+                                    "entityName": "@outputs('Entity_Name')",
+                                    "recordId": "@slice(items('Apply_to_each_approved_record')?['@odata.editLink'], add(indexOf(items('Apply_to_each_approved_record')?['@odata.editLink'], '('), 1), indexOf(items('Apply_to_each_approved_record')?['@odata.editLink'], ')'))",
+                                    "item": {
+                                      "msdyn_dataconnectionrefresh@odata.bind": "msdyn_dataconnectionrefreshes(@{outputs('Create_A_Temporary_-_Connection_Refresh')?['body/msdyn_dataconnectionrefreshid']})"
+                                    }
+                                  },
+                                  "authentication": "@parameters('$authentication')"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "or": [
+                              {
+                                "equals": [
+                                  "@outputs('Entity_Name')",
+                                  "msdyn_mobilecombustions"
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@outputs('Entity_Name')",
+                                  "msdyn_fugitiveemissions"
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@outputs('Entity_Name')",
+                                  "msdyn_industrialprocesses"
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@outputs('Entity_Name')",
+                                  "msdyn_mobilecombustions"
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@outputs('Entity_Name')",
+                                  "msdyn_purchasedenergies"
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@outputs('Entity_Name')",
+                                  "msdyn_stationarycombustions"
+                                ]
+                              }
+                            ]
+                          },
+                          "metadata": {
+                            "operationMetadataId": "ace40869-9634-415d-881a-1c9a1f42a3b8"
+                          },
+                          "type": "If"
+                        }
+                      },
+                      "runAfter": {
+                        "Turn_Off_Approval_for_Given_Table": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "52e355bb-5d33-42e6-9823-5cf755de124c"
+                      },
+                      "type": "Foreach"
+                    }
+                  },
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "b7acbaa5-fdfc-4864-9d46-33973b1680f1"
+                  },
+                  "type": "Scope"
+                },
+                "Turn_it_Approval_Management_Back_on_for_the_activity": {
+                  "actions": {
+                    "Turn__Back_On_Approval_for_Given_Activity": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "6e34e375-91ca-4693-a462-086c0f02e3c0"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_commondataserviceforapps_2",
+                          "operationId": "UpdateOnlyRecord",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                        },
+                        "parameters": {
+                          "entityName": "msdyn_sustainabilitydatadefinitionsettings",
+                          "recordId": "@items('For_each_activity_type')?['msdyn_sustainabilitydatadefinitionsettingid']",
+                          "item/msdyn_requiredataapproval": true
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Turn_Off_Approval_Management_and_Do_Updates": [
+                      "Succeeded",
+                      "Failed",
+                      "TimedOut"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "d399c27c-b893-4f90-a49c-793ab1fbf7ce"
+                  },
+                  "type": "Scope"
+                }
+              },
+              "runAfter": {
+                "Has_No_Approved_Record": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@outputs('Has_No_Approved_Record')",
+                  "@false"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "91bd00e8-3eab-4048-8300-65a4bf9194e7"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Get_All_Sustainability_Data_Definition_Activities_Enabled_for_Approval": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "ad2363be-44f7-4ef0-ba62-2afd53c878cb"
+          },
+          "type": "Foreach",
+          "runtimeConfiguration": {
+            "concurrency": {
+              "repetitions": 20
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

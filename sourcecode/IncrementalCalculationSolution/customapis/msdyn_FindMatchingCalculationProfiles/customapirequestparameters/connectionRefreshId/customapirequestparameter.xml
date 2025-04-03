@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="connectionRefreshId">
+  <description default="connectionRefreshId">
+    <label description="connectionRefreshId" languagecode="1033" />
+  </description>
+  <displayname default="connectionRefreshId">
+    <label description="connectionRefreshId" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>connectionRefreshId</name>
+  <type>10</type>
+</customapirequestparameter>

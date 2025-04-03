@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25024.216" OrganizationSchemaType="Full" CRMServerServiceabilityVersion="9.2.25024.00216">
+  <Entities />
+  <Roles />
+  <Workflows />
+  <FieldSecurityProfiles />
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls />
+  <SolutionPluginAssemblies />
+  <EntityDataProviders />
+  <connectionreferences>
+    <connectionreference connectionreferencelogicalname="new_sharedcommondataserviceforapps_83942">
+      <connectionreferencedisplayname>Microsoft Dataverse</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps</connectorid>
+      <iscustomizable>1</iscustomizable>
+      <promptingbehavior>0</promptingbehavior>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+  </connectionreferences>
+  <msdyn_dataconnections>
+    <msdyn_dataconnection msdyn_dataconnectionid="832393a5-e80f-f011-9988-002248092ab2">
+      <iscustomizable>1</iscustomizable>
+      <msdyn_dataconnectionstatus>700610003</msdyn_dataconnectionstatus>
+      <msdyn_dataconnectiontype>192350005</msdyn_dataconnectiontype>
+      <msdyn_dataconnector>
+        <msdyn_dataconnectorid>3e8b5d97-8459-ef11-a316-6045bd08dd6d</msdyn_dataconnectorid>
+      </msdyn_dataconnector>
+      <msdyn_deletedataonrefresh>0</msdyn_deletedataonrefresh>
+      <msdyn_description>System connection used to flag data updates done by custom automations</msdyn_description>
+      <msdyn_name>System Connection</msdyn_name>
+      <msdyn_readytoimport>0</msdyn_readytoimport>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </msdyn_dataconnection>
+  </msdyn_dataconnections>
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>

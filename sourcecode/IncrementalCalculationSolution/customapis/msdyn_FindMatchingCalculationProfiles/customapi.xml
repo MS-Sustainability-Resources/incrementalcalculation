@@ -1,0 +1,18 @@
+<customapi uniquename="msdyn_FindMatchingCalculationProfiles">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Find Matching Calculation Profiles">
+    <label description="Find Matching Calculation Profiles" languagecode="1033" />
+  </description>
+  <displayname default="FindMatchingCalculationProfiles">
+    <label description="FindMatchingCalculationProfiles" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>msdyn_FindMatchingCalculationProfiles</name>
+  <plugintypeid>
+    <plugintypeexportkey>cbdf05aa-ddbf-41b6-a838-8085864af91a</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>

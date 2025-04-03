@@ -1,0 +1,331 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedcommondataserviceforapps_83942"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "c890175d-f1b5-422e-8157-d4162431044b"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Activity SDD Id",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Sustainability Data Definition Record Id of the target activity",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "List_Calculation_profiles_for_specific_data_type": {
+          "runAfter": {
+            "Initialize_ModifiedFetch_-_Fetch_with_added_modified_on": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0498554e-59ce-4588-9507-9755b28a1d72"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps_1",
+              "operationId": "ListRecords",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "entityName": "msdyn_calculationprofiles",
+              "$filter": "_msdyn_datadefinition_value eq '@{triggerBody()['text']}'"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "For_each_calculation_profiles_for_a_specific_activity_type": {
+          "foreach": "@outputs('List_Calculation_profiles_for_specific_data_type')?['body/value']",
+          "actions": {
+            "List_calculation_history_for_a_specific_calculation_profile": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "1f5b73b8-fb72-41e1-b593-1821a9296781"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps_1",
+                  "operationId": "ListRecords",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "entityName": "msdyn_calculationjobs",
+                  "$filter": "_msdyn_calculationprofile_value eq '@{items('For_each_calculation_profiles_for_a_specific_activity_type')?['msdyn_calculationprofileid']}' and msdyn_status eq 700610003",
+                  "$orderby": "msdyn_starttime desc",
+                  "$top": 1
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                }
+              }
+            },
+            "Top_1_calc_history_so_this_should_run_only_1": {
+              "foreach": "@outputs('List_calculation_history_for_a_specific_calculation_profile')?['body/value']",
+              "actions": {
+                "If_filter_doesn't_have_and_condition_yet": {
+                  "actions": {
+                    "Set_the_condition_with_the_filter_option": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "ee995823-8211-4dbf-b402-6d4f966f4952"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "LastRun",
+                        "value": ">        <filter type=\"and\">            <condition attribute=\"modifiedon\" operator=\"on-or-after\" value=\"@{items('Top_1_calc_history_so_this_should_run_only_1')?['msdyn_starttime']}\" />        </filter>    </entity></fetch>"
+                      }
+                    },
+                    "Extend_the_existing_filter_fetch_xml": {
+                      "runAfter": {
+                        "Set_the_condition_with_the_filter_option": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "6a7b01f4-758b-4be9-8072-0116453ccf67"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "ModifiedFetch",
+                        "value": "@{replace(variables('FilterFetch'), '/> </fetch>', variables('LastRun'))}"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Save_the_current_filter_from_calc_profile": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Set_the_condition_based_on_last_run": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "fc6a27ab-d85b-42b8-b573-89d8950242e6"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "LastRun",
+                          "value": "<condition attribute=\"modifiedon\" operator=\"on-or-after\" value=\"@{items('Top_1_calc_history_so_this_should_run_only_1')?['msdyn_starttime']}\" />        </filter>"
+                        }
+                      },
+                      "Extend_the_existing_filter_fetch_xml_2": {
+                        "runAfter": {
+                          "Set_the_condition_based_on_last_run": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "c7d69de9-807c-4ea9-a378-eca19992d451"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "ModifiedFetch",
+                          "value": "@{replace(variables('FilterFetch'), '</filter>', variables('LastRun'))}"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "contains": [
+                      "@variables('FilterFetch')",
+                      "/></fetch>"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "092f85ab-6fd0-4f42-ae38-12e9e138940d"
+                  },
+                  "type": "If"
+                },
+                "Save_the_current_filter_from_calc_profile": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "ee26cec8-47bd-4a28-a050-f0f895dcf69b"
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "FilterFetch",
+                    "value": "@items('For_each_calculation_profiles_for_a_specific_activity_type')?['msdyn_filter']"
+                  }
+                },
+                "Update_the_calc_profile_with_the_extended_filter_fetch_xml": {
+                  "runAfter": {
+                    "If_filter_doesn't_have_and_condition_yet": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "22fbec3e-b4a9-4b0c-9a67-ae81601c46f9"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_commondataserviceforapps_1",
+                      "operationId": "UpdateRecord",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                    },
+                    "parameters": {
+                      "entityName": "msdyn_calculationprofiles",
+                      "recordId": "@items('For_each_calculation_profiles_for_a_specific_activity_type')?['msdyn_calculationprofileid']",
+                      "item/msdyn_filter": "@variables('ModifiedFetch')"
+                    },
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                    }
+                  }
+                },
+                "Create_a_calculation_job_to_trigger_the_calc_engine": {
+                  "runAfter": {
+                    "Update_the_calc_profile_with_the_extended_filter_fetch_xml": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "78a83fc0-a2ca-4327-a2dc-6a2d0cc45759"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_commondataserviceforapps_1",
+                      "operationId": "CreateRecord",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                    },
+                    "parameters": {
+                      "entityName": "msdyn_calculationjobs",
+                      "item/msdyn_calculationprofile@odata.bind": "/msdyn_calculationprofiles(msdyn_calculationprofileid=@{items('For_each_calculation_profiles_for_a_specific_activity_type')?['msdyn_calculationprofileid']})",
+                      "item/msdyn_status": 700610000,
+                      "item/msdyn_name": "@items('For_each_calculation_profiles_for_a_specific_activity_type')?['msdyn_name']"
+                    },
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                    }
+                  }
+                }
+              },
+              "runAfter": {
+                "List_calculation_history_for_a_specific_calculation_profile": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "2a54707f-196d-42ac-a0f5-4d57e5dab306"
+              },
+              "type": "Foreach"
+            }
+          },
+          "runAfter": {
+            "List_Calculation_profiles_for_specific_data_type": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d3549235-6ed3-468d-b8f3-e6ad09b369cc"
+          },
+          "type": "Foreach"
+        },
+        "Initialize_Last_run": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "224df486-976c-4592-9522-5adaa8a11804"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "LastRun",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_FilterFetch_-_Original_filter_from_Calc_profile": {
+          "runAfter": {
+            "Initialize_Last_run": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6b5ee311-f8f4-497c-920c-128cbcadd8c8"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "FilterFetch",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_ModifiedFetch_-_Fetch_with_added_modified_on": {
+          "runAfter": {
+            "Initialize_FilterFetch_-_Original_filter_from_Calc_profile": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f6901d0b-ff89-443d-81d4-961ab012f9ef"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ModifiedFetch",
+                "type": "string"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

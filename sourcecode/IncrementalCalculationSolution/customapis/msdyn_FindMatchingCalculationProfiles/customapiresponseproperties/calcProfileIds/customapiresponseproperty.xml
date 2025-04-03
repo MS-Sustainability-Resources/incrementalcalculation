@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="calcProfileIds">
+  <description default="calcProfileIds">
+    <label description="calcProfileIds" languagecode="1033" />
+  </description>
+  <displayname default="calcProfileIds">
+    <label description="calcProfileIds" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>calcProfileIds</name>
+  <type>11</type>
+</customapiresponseproperty>
