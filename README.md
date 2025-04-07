@@ -18,7 +18,7 @@ This accelerator is aiming to address these automation gaps for below scenarios:
 
 ### Scenario-3: Activity data is imported using Excel/CSV files using PowerApps Import capabilities
 
-### Scenario-3: Data Approval Management is enabled for Activity data and calculation needs to be run when they are approved
+### Scenario-4: Data Approval Management is enabled for Activity data and calculation needs to be run when they are approved
 
 ## Solution Overview
 
