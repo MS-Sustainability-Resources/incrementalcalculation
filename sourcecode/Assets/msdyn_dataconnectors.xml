@@ -1,0 +1,12 @@
+<msdyn_dataconnectors>
+  <msdyn_dataconnector msdyn_dataconnectorid="3e8b5d97-8459-ef11-a316-6045bd08dd6d">
+    <iscustomizable>1</iscustomizable>
+    <msdyn_connectorstatus>700610001</msdyn_connectorstatus>
+    <msdyn_connectortype>700610001</msdyn_connectortype>
+    <msdyn_name>System Connector</msdyn_name>
+    <msdyn_supportlinkurl>https://www.example.com</msdyn_supportlinkurl>
+    <msdyn_title>System Connector used to flag data updates done by custom automations</msdyn_title>
+    <statecode>0</statecode>
+    <statuscode>1</statuscode>
+  </msdyn_dataconnector>
+</msdyn_dataconnectors>
